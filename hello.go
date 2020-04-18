@@ -8,6 +8,9 @@ const englishHelloPrefix = "Hello, "
 
 // Hello : It says hello
 func Hello(name string) string {
+	if name == "" {
+		return "Hello, World"
+	}
 	return englishHelloPrefix + name
 }
 
