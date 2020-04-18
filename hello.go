@@ -4,9 +4,11 @@ import (
 	"fmt"
 )
 
-const spanishParameter = "Spanish"
+const spanish = "Spanish"
+const french = "French"
 const englishHelloPrefix = "Hello, "
 const spanishHelloPrefix = "Hola, "
+const frenchHelloPrefix = "Bonjour, "
 const defaultName = "World"
 
 // Hello : It says hello
@@ -15,11 +17,19 @@ func Hello(name string, language string) string {
 		name = defaultName
 	}
 
-	if language == spanishParameter {
-		return spanishHelloPrefix + name
-	}
+	return prefixGreeting(language) + name
+}
 
-	return englishHelloPrefix + name
+func prefixGreeting(language string) (prefix string) {
+	switch language {
+	case french:
+		prefix = frenchHelloPrefix
+	case spanish:
+		prefix = spanishHelloPrefix
+	default:
+		prefix = englishHelloPrefix
+	}
+	return
 }
 
 func main() {
