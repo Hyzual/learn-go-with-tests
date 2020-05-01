@@ -1,34 +1,35 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"strings"
 )
 
+const jsonContentType = "application/json"
+
 type PlayerServer struct {
-	store  PlayerStore
-	router *http.ServeMux
+	store PlayerStore
+	http.Handler
 }
 
 func NewPlayerServer(store PlayerStore) *PlayerServer {
-	p := &PlayerServer{
-		store,
-		http.NewServeMux(),
-	}
+	p := new(PlayerServer)
 
-	p.router.Handle("/league", http.HandlerFunc(p.leagueHandler))
-	p.router.Handle("/players/", http.HandlerFunc(p.playersHandler))
+	p.store = store
+	router := http.NewServeMux()
+	router.Handle("/league", http.HandlerFunc(p.leagueHandler))
+	router.Handle("/players/", http.HandlerFunc(p.playersHandler))
+
+	p.Handler = router
 
 	return p
 }
 
-func (p *PlayerServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	p.router.ServeHTTP(w, r)
-}
-
 func (p *PlayerServer) leagueHandler(writer http.ResponseWriter, request *http.Request) {
-	writer.WriteHeader(http.StatusOK)
+	writer.Header().Set("content-type", jsonContentType)
+	json.NewEncoder(writer).Encode(p.store.GetLeague())
 }
 
 func (p *PlayerServer) playersHandler(writer http.ResponseWriter, request *http.Request) {
@@ -57,7 +58,13 @@ func (p *PlayerServer) processWin(writer http.ResponseWriter, player string) {
 	writer.WriteHeader(http.StatusAccepted)
 }
 
+type Player struct {
+	Name string
+	Wins int
+}
+
 type PlayerStore interface {
 	GetPlayerScore(name string) int
 	RecordWin(name string)
+	GetLeague() []Player
 }
