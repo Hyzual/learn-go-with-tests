@@ -7,10 +7,31 @@ import (
 )
 
 type PlayerServer struct {
-	store PlayerStore
+	store  PlayerStore
+	router *http.ServeMux
 }
 
-func (p *PlayerServer) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
+func NewPlayerServer(store PlayerStore) *PlayerServer {
+	p := &PlayerServer{
+		store,
+		http.NewServeMux(),
+	}
+
+	p.router.Handle("/league", http.HandlerFunc(p.leagueHandler))
+	p.router.Handle("/players/", http.HandlerFunc(p.playersHandler))
+
+	return p
+}
+
+func (p *PlayerServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	p.router.ServeHTTP(w, r)
+}
+
+func (p *PlayerServer) leagueHandler(writer http.ResponseWriter, request *http.Request) {
+	writer.WriteHeader(http.StatusOK)
+}
+
+func (p *PlayerServer) playersHandler(writer http.ResponseWriter, request *http.Request) {
 	player := strings.TrimPrefix(request.URL.Path, "/players/")
 
 	switch request.Method {

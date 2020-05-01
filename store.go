@@ -3,7 +3,7 @@ package main
 import "sync"
 
 func NewInMemoryPlayerStore() *InMemoryPlayerStore {
-	return &InMemoryPlayerStore{map[string]int{}}
+	return &InMemoryPlayerStore{store: map[string]int{}}
 }
 
 type InMemoryPlayerStore struct {
