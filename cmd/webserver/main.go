@@ -1,0 +1,26 @@
+package main
+
+import (
+	"log"
+	"net/http"
+
+	poker "github.com/hyzual/mike-sierra-sierra"
+)
+
+const dbFileName = "game.db.json"
+
+func main() {
+	store, closeFunc, err := poker.FileSystemPlayerStoreFromFile(dbFileName)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer closeFunc()
+
+	server := poker.NewPlayerServer(store)
+
+	err = http.ListenAndServe(":5000", server)
+	if err != nil {
+		log.Fatalf("could not listen on port 5000 %v", err)
+	}
+}
